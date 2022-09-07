@@ -1,5 +1,11 @@
 import pandas as pd
 
+
+def editDateFormat(str):
+    #intended for a date in format dd/mm/yy and makes it yy-mm-dd
+    split = str.split('/')
+    return '-'.join(reversed(split))
+
 def fetchDataFrames():
 
     pathToStats = 'csv_files/stats2022.csv'
@@ -12,15 +18,7 @@ def fetchDataFrames():
     for index in fixtures.index:
         fixtures.loc[index, 'date'] = editDateFormat(fixtures.loc[index, 'date'])
 
-    return stats, fixtures
+    return fixtures, stats
 
     
-
-def editDateFormat(str):
-    #intended for a date in format dd/mm/yy and makes it yy-mm-dd
-
-    split = str.split('/')
-
-    return '-'.join(reversed(split))
-
 

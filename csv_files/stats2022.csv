@@ -1,4 +1,4 @@
-﻿fixture_id,balls,runs,fours,sixes,m_o_d
+﻿fixture_id,balls_faced,runs_scored,fours,sixes,m_o_d
 1,24,22,3,0,bowled
 2,16,17,1,1,caught
 3,3,1,0,0,caught
