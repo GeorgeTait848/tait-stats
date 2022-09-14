@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from connect import fetchConnection
-import matplotlib.pyplot as plt
+import plotly.express as px
 
 class StatsAnalyser: 
 
@@ -57,16 +57,8 @@ class StatsAnalyser:
     def plotLocalAverages(self, overGames=3):
 
         localAves = self.getLocalAverages(overGames)
-        weeks = localAves['week no.'].tolist()
-        aves = localAves['local ave'].tolist()
-
-
-        plt.plot(weeks, aves, 'ko-', markersize=4, linewidth=0.8)
-        plt.xlabel('Week Number')
-        plt.ylabel('Local Average over last {} games'.format(overGames))
-        plt.grid()
-        plt.show()
-
+        fig = px.line(localAves, x='week no.', y='local ave', markers=True)
+        fig.show()
 
 
 
