@@ -10,3 +10,11 @@ displaying skills in SQL, psycopg2 and pandas by storing stats from a csv file t
 ## IMPORTANT
 Once setup_params.sh has been run, params.ini will contain the db name and your password. 
 If you wish to keep these on file, you can add params.ini to your .gitignore file, else run reset_params.sh to remove db name and password.
+
+
+##Database Strucure
+
+![statsSchema](https://user-images.githubusercontent.com/78791293/192114575-e62a35fc-2901-42b6-adbe-e5aa19b79a77.png)
+
+This structure is used as long term it will allow me to add data from different seasons, teams and formats.
+With the previous structure this would not have been possible. Using a snowflake schema.
