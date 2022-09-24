@@ -12,7 +12,7 @@ Once setup_params.sh has been run, params.ini will contain the db name and your 
 If you wish to keep these on file, you can add params.ini to your .gitignore file, else run reset_params.sh to remove db name and password.
 
 
-## Database Strucure
+## Database Structure
 
 ![statsSchema](https://user-images.githubusercontent.com/78791293/192114575-e62a35fc-2901-42b6-adbe-e5aa19b79a77.png)
 
