@@ -1,3 +1,4 @@
+from nis import match
 from operator import le
 from readCSV import *
 from connect import *
@@ -6,25 +7,55 @@ from connect import *
 def getTableNames():
     return 'fixtures', 'stats'
 
+def getFieldsInfo(tableName):
+    
 
-def getTableFieldInfo():
+    tableFields = {
 
-    fixturesFieldInfo = '''fixture_id SERIAL PRIMARY KEY,
-    home_away VARCHAR(50) NOT NULL,
-    opposition VARCHAR(50) NOT NULL,
-    format VARCHAR(50) NOT NULL,
-    date DATE NOT NULL'''
+        'dismissals': '''dismissal_id SERIAL PRIMARY KEY,
+            dismissal_name VARCHAR(50) NOT NULL''',
+        
+        'teams': '''team_id SERIAL PRIMARY KEY,
+            team_name VARCHAR(50)''',
 
-    statsFieldInfo = '''fixture_id SERIAL PRIMARY KEY,
-    balls_faced INT NOT NULL,
-    runs_scored INT NOT NULL,
-    fours INT NOT NULL,
-    sixes INT NOT NULL,
-    m_o_d VARCHAR(50) NOT NULL,
-    FOREIGN KEY(fixture_id) REFERENCES fixtures(fixture_id)'''
+        'formats': '''format_id SERIAL PRIMARY KEY,
+            format_name VARCHAR(50)''',
+        
+        'seasons': '''season_id SERIAL PRIMARY KEY,
+            year INT NOT NULL''',
 
-    return fixturesFieldInfo, statsFieldInfo
+        'dates': '''date_id SERIAL PRIMARY KEY,
+            FOREIGN KEY(season_id) REFERENCES seasons(season_id),
+            ''',
 
+        'fixtures': '''fixture_id SERIAL PRIMARY KEY,
+            FOREIGN KEY(date_id) REFERENCES dates(date_id),
+            FOREIGN KEY(format_id) REFERENCES formats(format_id),
+            FOREIGN KEY(team_id) REFERENCES teams(team_id),
+            opposition VARCHAT(50) NOT NULL,
+            home BOOL NOT NULL''',
+        
+        'stats': '''FOREIGN KEY(fixture_id) REFERENCES fixtures(fixture_id),
+            FOREIGN KEY(dismissal_id) REFERENCES dismissals(dismissals_id),
+            runs INT NOT NULL,
+            balls INT NOT NULL,
+            fours INT NOT NULL,
+            sixes INT NOT NULL'''
+    }
+
+    if tableName not in tableFields:
+        names = list(tableFields.keys())
+
+        print(' \n{} is not a required table name.'.format(tableName))
+        print('The names of the tables of this database are:')
+    
+        for name in names:
+            print(name)
+
+        return
+
+    return tableFields[tableName]
+    
 
 
 def createTable (conn, cursor, tableName, fieldInfo): 
@@ -107,22 +138,23 @@ def initialiseTableFromDF(conn, cursor, tableName, df, containsIDs = True, keepI
 
 
 def main():
-    fixtures_df, stats_df = fetchDataFrames()
+    # fixtures_df, stats_df = fetchDataFrames()
 
-    fixturesTableName, statsTableName = getTableNames()
-    fixturesFieldInfo, statsFieldInfo = getTableFieldInfo()
+    # fixturesTableName, statsTableName = getTableNames()
+    # fixturesFieldInfo, statsFieldInfo = getTableFieldInfo()
 
     conn = fetchConnection()
     cursor = conn.cursor()
 
-    createTable(conn, cursor, fixturesTableName, fixturesFieldInfo)
-    createTable(conn, cursor, statsTableName, statsFieldInfo)
-    initialiseTableFromDF(conn, cursor, fixturesTableName, fixtures_df)
-    initialiseTableFromDF(conn, cursor, statsTableName, stats_df)
-    # createTable(conn, cursor, statsTableName, statsFieldInfo)
+    getFieldsInfo('dismissals')
 
+    # createTable(conn, cursor, fixturesTableName, fixturesFieldInfo)
+    # createTable(conn, cursor, statsTableName, statsFieldInfo)
+    # initialiseTableFromDF(conn, cursor, fixturesTableName, fixtures_df)
+    # initialiseTableFromDF(conn, cursor, statsTableName, stats_df)
     cursor.close()
     conn.close()
+
     
 
 
