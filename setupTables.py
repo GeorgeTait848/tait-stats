@@ -1,15 +1,8 @@
-from nis import match
-from operator import le
 from readCSV import *
 from connect import *
 
 
-def getTableNames():
-    return 'fixtures', 'stats'
-
 def getFieldsInfo(tableName):
-    
-
     tableFields = {
 
         'dismissals': '''dismissal_id SERIAL PRIMARY KEY,
@@ -26,7 +19,8 @@ def getFieldsInfo(tableName):
 
         'dates': '''date_id SERIAL PRIMARY KEY,
             FOREIGN KEY(season_id) REFERENCES seasons(season_id),
-            ''',
+            week_no int,
+            date date NOT NULL''',
 
         'fixtures': '''fixture_id SERIAL PRIMARY KEY,
             FOREIGN KEY(date_id) REFERENCES dates(date_id),
@@ -58,14 +52,15 @@ def getFieldsInfo(tableName):
     
 
 
-def createTable (conn, cursor, tableName, fieldInfo): 
+def createTable (conn, cursor, tableName): 
+
+    fieldsInfo = getFieldsInfo(tableName)
 
     cursor.execute('DROP TABLE IF EXISTS {}'.format(tableName))
     conn.commit()
 
     sql_query = '''CREATE TABLE {}(
-        {}
-        );'''.format(tableName, fieldInfo)
+        {});'''.format(tableName, fieldsInfo)
 
     cursor.execute(sql_query)
     conn.commit()
@@ -85,8 +80,9 @@ def getInsertStatement(tableName, *cols):
 
 
 
-def initialiseTableFromDF(conn, cursor, tableName, df, containsIDs = True, keepIDs = False):
+def initialiseTableFromDF(conn, cursor, tableName, containsIDs = True, keepIDs = False):
 
+    df = fetchDFfromCSV(tableName)
     header = df.columns.tolist()
     data = df.itertuples()
 
@@ -116,8 +112,7 @@ def initialiseTableFromDF(conn, cursor, tableName, df, containsIDs = True, keepI
                 temp += "'{}', ".format(row[i])
 
         if type(row[len(row)-1]) != str:
-            temp += '''{}),
-            '''.format(row[len(row)-1])
+            temp += '{}),'.format(row[len(row)-1])
         else: 
             temp += "'{}'),".format(row[len(row)-1])
 
@@ -130,28 +125,19 @@ def initialiseTableFromDF(conn, cursor, tableName, df, containsIDs = True, keepI
     cursor.execute(query)
     conn.commit()
     print('Successfully initialised table {}'.format(tableName))
-    
-
-
-
-
 
 
 def main():
-    # fixtures_df, stats_df = fetchDataFrames()
-
-    # fixturesTableName, statsTableName = getTableNames()
-    # fixturesFieldInfo, statsFieldInfo = getTableFieldInfo()
-
     conn = fetchConnection()
     cursor = conn.cursor()
 
-    getFieldsInfo('dismissals')
+    names = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'fixtures', 'stats']
 
-    # createTable(conn, cursor, fixturesTableName, fixturesFieldInfo)
-    # createTable(conn, cursor, statsTableName, statsFieldInfo)
-    # initialiseTableFromDF(conn, cursor, fixturesTableName, fixtures_df)
-    # initialiseTableFromDF(conn, cursor, statsTableName, stats_df)
+    for name in names: 
+
+        createTable(conn, cursor, name)
+        initialiseTableFromDF(conn, cursor, name)
+
     cursor.close()
     conn.close()
 

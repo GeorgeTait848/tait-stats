@@ -6,19 +6,56 @@ def editDateFormat(str):
     split = str.split('/')
     return '-'.join(reversed(split))
 
-def fetchDataFrames():
+    
+def fetchDFfromCSV(key):
 
-    pathToStats = 'csv_files/stats2022.csv'
-    pathToFixtures = 'csv_files/fixtures2022.csv'
+    'returns a pandas dataframe with the contents of the csv file with name referred to by key'
 
-    stats = pd.read_csv(pathToStats)
-    fixtures = pd.read_csv(pathToFixtures)
+    csvDirectory = './csv_files/'
 
-    #need to edit date format so compatible with sql date type.
-    for index in fixtures.index:
-        fixtures.loc[index, 'date'] = editDateFormat(fixtures.loc[index, 'date'])
+    pathsDict = {
+        'dismissals': csvDirectory + 'dismissals.csv',
+        'teams': csvDirectory + 'teams.csv',
+        'formats': csvDirectory + 'formats.csv',
+        'seasons': csvDirectory + 'seasons.csv',
+        'dates': csvDirectory + 'dates.csv',
+        'fixtures': csvDirectory + 'fixtures.csv',
+        'stats': csvDirectory + 'stats.csv'
+    }
 
-    return fixtures, stats
+    if key not in pathsDict: 
+        print('The key {} does not refer to a path to an existing csv file')
+        print('The possible options are:')
+
+        correctKeys = list(pathsDict.keys())
+
+        for correctKey in correctKeys:
+            print(correctKey)
+
+        return
+    
+    df = pd.read_csv(pathsDict[key])
+
+    if key == 'dates':
+
+        for index in df.index:
+         df.loc[index, 'date'] = editDateFormat(df.loc[index, 'date'])
+    
+    return df
+
+
 
     
+def main():
 
+    '''Tests the fetchDFfromCSV function'''
+    names = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'fixtures', 'stats']
+
+    for name in names: 
+        print(fetchDFfromCSV(name)) 
+        print('\n')
+
+
+
+if __name__ == '__main__':
+    main()
