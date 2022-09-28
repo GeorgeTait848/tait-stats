@@ -18,23 +18,35 @@ def getFieldsInfo(tableName):
             year INT NOT NULL''',
 
         'dates': '''date_id SERIAL PRIMARY KEY,
-            FOREIGN KEY(season_id) REFERENCES seasons(season_id),
+            season_id INT NOT NULL,
             week_no int,
-            date date NOT NULL''',
+            date date NOT NULL,
+            CONSTRAINT fk_season
+                FOREIGN KEY(season_id) REFERENCES seasons(season_id)''',
 
         'fixtures': '''fixture_id SERIAL PRIMARY KEY,
-            FOREIGN KEY(date_id) REFERENCES dates(date_id),
-            FOREIGN KEY(format_id) REFERENCES formats(format_id),
-            FOREIGN KEY(team_id) REFERENCES teams(team_id),
-            opposition VARCHAT(50) NOT NULL,
-            home BOOL NOT NULL''',
+            date_id INT NOT NULL,
+            format_id INT NOT NULL,
+            team_id INT NOT NULL,
+            opposition VARCHAR(50) NOT NULL,
+            home_away VARCHAR(50) NOT NULL,
+            CONSTRAINT fk_date
+                FOREIGN KEY(date_id) REFERENCES dates(date_id),
+            CONSTRAINT fk_format
+                FOREIGN KEY(format_id) REFERENCES formats(format_id),
+            CONSTRAINT fk_team
+                FOREIGN KEY(team_id) REFERENCES teams(team_id)''',
         
-        'stats': '''FOREIGN KEY(fixture_id) REFERENCES fixtures(fixture_id),
-            FOREIGN KEY(dismissal_id) REFERENCES dismissals(dismissals_id),
-            runs INT NOT NULL,
+        'stats': '''fixture_id INT NOT NULL,
+            dismissal_id INT NOT NULL,
             balls INT NOT NULL,
+            runs INT NOT NULL,
             fours INT NOT NULL,
-            sixes INT NOT NULL'''
+            sixes INT NOT NULL,
+            CONSTRAINT fk_fixture
+                FOREIGN KEY(fixture_id) REFERENCES fixtures(fixture_id),
+            CONSTRAINT fk_dismissal
+                FOREIGN KEY(dismissal_id) REFERENCES dismissals(dismissal_id)'''
     }
 
     if tableName not in tableFields:
@@ -56,7 +68,7 @@ def createTable (conn, cursor, tableName):
 
     fieldsInfo = getFieldsInfo(tableName)
 
-    cursor.execute('DROP TABLE IF EXISTS {}'.format(tableName))
+    cursor.execute('DROP TABLE IF EXISTS {} CASCADE;'.format(tableName))
     conn.commit()
 
     sql_query = '''CREATE TABLE {}(
@@ -131,12 +143,16 @@ def main():
     conn = fetchConnection()
     cursor = conn.cursor()
 
-    names = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'fixtures', 'stats']
-
-    for name in names: 
+    namesWithoutStats = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'fixtures']
+    for name in namesWithoutStats: 
 
         createTable(conn, cursor, name)
         initialiseTableFromDF(conn, cursor, name)
+
+    #stats requires the column fixture_id to be kept as it has no serial column
+
+    createTable(conn, cursor, 'stats')
+    initialiseTableFromDF(conn, cursor, 'stats', containsIDs=True, keepIDs=True)
 
     cursor.close()
     conn.close()
