@@ -14,11 +14,11 @@ class StatsAnalyser:
 
         cur = self.cursor
 
-        cur.execute('SELECT runs_scored FROM stats;')
-        allRuns = pd.DataFrame(self.cursor.fetchall(), columns=['runs_scored'])
-        totalRuns = allRuns['runs_scored'].sum()
+        cur.execute('SELECT runs FROM stats;')
+        allRuns = pd.DataFrame(self.cursor.fetchall(), columns=['runs'])
+        totalRuns = allRuns['runs'].sum()
         
-        cur.execute("SELECT COUNT(m_o_d) FROM stats WHERE m_o_d != 'not out'")
+        cur.execute("SELECT COUNT(dismissal_id) FROM stats WHERE dismissal_id != 9")
         noOfDismissals = cur.fetchone()[0]
 
         return totalRuns/noOfDismissals
@@ -29,11 +29,11 @@ class StatsAnalyser:
 
         cur = self.cursor
         
-        cur.execute('SELECT fixture_id, runs_scored, m_o_d FROM stats')
-        data = pd.DataFrame(cur.fetchall(), columns=['id', 'runs', 'mod'])
+        cur.execute('SELECT fixture_id, runs, dismissal_id FROM stats')
+        data = pd.DataFrame(cur.fetchall(), columns=['id', 'runs', 'dismissal_id'])
 
         runs = data['runs'].tolist()
-        mods = data['mod'].tolist()
+        mods = data['dismissal_id'].tolist()
         ids = data['id']
         averages = []
 
@@ -44,7 +44,7 @@ class StatsAnalyser:
 
 
             localTotal = sum(localRuns)
-            localDismissals = list(filter(lambda str: (str != 'not out'), local_mods))
+            localDismissals = list(filter(lambda int: (int != 9), local_mods))
             localNumDismissals = len(localDismissals)
             localAve = localTotal/localNumDismissals
             localDict = {'week no.': ids[i], 'local ave': localAve}
