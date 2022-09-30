@@ -152,7 +152,7 @@ def main():
     #stats requires the column fixture_id to be kept as it has no serial column
 
     createTable(conn, cursor, 'stats')
-    initialiseTableFromDF(conn, cursor, 'stats', containsIDs=True, keepIDs=True)
+    initialiseTableFromDF(conn, cursor, 'stats', containsIDs=False)
 
     cursor.close()
     conn.close()
