@@ -24,18 +24,23 @@ def getFieldsInfo(tableName):
             CONSTRAINT fk_season
                 FOREIGN KEY(season_id) REFERENCES seasons(season_id)''',
 
+        'oppositions': '''opposition_id SERIAL PRIMARY KEY,
+            opposition_name VARCHAR(50)''',
+
         'fixtures': '''fixture_id SERIAL PRIMARY KEY,
             date_id INT NOT NULL,
             format_id INT NOT NULL,
             team_id INT NOT NULL,
-            opposition VARCHAR(50) NOT NULL,
+            opposition_id INT NOT NULL,
             home_away VARCHAR(50) NOT NULL,
             CONSTRAINT fk_date
                 FOREIGN KEY(date_id) REFERENCES dates(date_id),
             CONSTRAINT fk_format
                 FOREIGN KEY(format_id) REFERENCES formats(format_id),
             CONSTRAINT fk_team
-                FOREIGN KEY(team_id) REFERENCES teams(team_id)''',
+                FOREIGN KEY(team_id) REFERENCES teams(team_id),
+            CONSTRAINT fk_oppo
+                FOREIGN KEY (opposition_id) REFERENCES oppositions(opposition_id)''',
         
         'stats': '''fixture_id INT NOT NULL,
             dismissal_id INT NOT NULL,
@@ -52,7 +57,8 @@ def getFieldsInfo(tableName):
     if tableName not in tableFields:
         names = list(tableFields.keys())
 
-        print(' \n{} is not a required table name.'.format(tableName))
+        print('''
+        {} is not a required table name.'''.format(tableName))
         print('The names of the tables of this database are:')
     
         for name in names:
@@ -143,7 +149,7 @@ def main():
     conn = fetchConnection()
     cursor = conn.cursor()
 
-    namesWithoutStats = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'fixtures']
+    namesWithoutStats = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'oppositions', 'fixtures']
     for name in namesWithoutStats: 
 
         createTable(conn, cursor, name)

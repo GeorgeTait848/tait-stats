@@ -20,7 +20,8 @@ def fetchDFfromCSV(key):
         'seasons': csvDirectory + 'seasons.csv',
         'dates': csvDirectory + 'dates.csv',
         'fixtures': csvDirectory + 'fixtures.csv',
-        'stats': csvDirectory + 'stats.csv'
+        'stats': csvDirectory + 'stats.csv',
+        'oppositions': csvDirectory + 'oppositions.csv',
     }
 
     if key not in pathsDict: 
@@ -49,7 +50,7 @@ def fetchDFfromCSV(key):
 def main():
 
     '''Tests the fetchDFfromCSV function'''
-    names = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'fixtures', 'stats']
+    names = ['dismissals', 'teams', 'formats', 'seasons', 'dates', 'fixtures', 'stats', 'oppositions']
 
     for name in names: 
         print(fetchDFfromCSV(name)) 
